@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เกม Truth or Dare | จริงหรือกล้า</title>
+    <!-- ใช้ Font Kanit สำหรับภาษาไทย -->
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF6B6B; /* แดงอมชมพู - จริง */
+            --secondary: #4ECDC4; /* เขียวน้ำทะเล - กล้า */
+            --accent: #FFE66D; /* เหลือง - สุ่ม */
+            --dark: #292F36; /* ดำ */
+            --light: #F7FFF7; /* ขาวอมเทา */
+            --purple: #9B5DE5; /* ม่วง - ปุ่มเพิ่ม */
+            --adult: #FF4D7A; /* ชมพูเข้ม - 18+ */
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Kanit', sans-serif;
+        }
+        
+        body {
+            /* พื้นหลังไล่เฉดสีสวยงาม */
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--purple));
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: var(--dark);
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); /* เงาที่ชัดเจนขึ้น */
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        h1 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 2.8rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .subtitle {
+            color: var(--dark);
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+        
+        .game-area {
+            margin: 30px 0;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            width: 100%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+            margin-bottom: 20px;
+            transition: transform 0.3s, opacity 0.3s;
+            position: relative;
+            overflow: hidden;
+            min-height: 150px; /* เพิ่มความสูงขั้นต่ำเพื่อให้ดูดี */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 10px; /* ขอบด้านข้างหนาขึ้น */
+            height: 100%;
+        }
+        
+        .truth-card::before { background-color: var(--primary); }
+        .dare-card::before { background-color: var(--secondary); }
+        /* 18+ ใช้ขอบสีชมพูเข้ม */
+        .adult-truth-card::before { background-color: var(--adult); } 
+        .adult-dare-card::before { background-color: var(--adult); }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .question {
+            font-size: 1.6rem;
+            margin-bottom: 10px;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+        
+        .type-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .truth-badge { background-color: var(--primary); color: white; }
+        .dare-badge { background-color: var(--secondary); color: white; }
+        .adult-badge { background-color: var(--adult); color: white; }
+        
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            min-width: 120px;
+        }
+        
+        .truth-btn { background-color: var(--primary); color: white; }
+        .dare-btn { background-color: var(--secondary); color: white; }
+        .adult-btn { background-color: var(--adult); color: white; }
+        .random-btn { background-color: var(--accent); color: var(--dark); }
+        
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        button:active {
+            transform: scale(0.98);
+        }
+        
+        .player-info {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .player {
+            background: var(--light);
+            padding: 10px 20px;
+            border-radius: 50px;
+            margin: 5px;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            font-weight: 400;
+        }
+        
+        .active-player {
+            background: var(--purple);
+            color: white;
+            font-weight: bold;
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+        }
+        
+        .mode-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .mode-btn {
+            padding: 10px 20px;
+            background: var(--light);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .mode-btn.active {
+            background: var(--dark);
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        .adult-warning {
+            background-color: rgba(255, 77, 122, 0.1);
+            border: 2px solid var(--adult);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .adult-warning p {
+            color: var(--adult);
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .add-question {
+            background: rgba(247, 255, 247, 0.8); /* พื้นหลังอ่อนๆ */
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .add-question h3 {
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        input, select {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 50px;
+            font-size: 1rem;
+            flex-grow: 1;
+            min-width: 150px;
+            font-family: 'Kanit', sans-serif;
+            background-color: white;
+        }
+        
+        #addBtn {
+            background-color: var(--purple);
+            color: white;
+            flex-grow: 0;
+            min-width: 100px;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            padding: 10px 0;
+        }
+        
+        .stat-item {
+            background: white;
+            padding: 15px 10px;
+            border-radius: 15px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            margin: 5px;
+            min-width: 100px;
+            flex-basis: 20%;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+        
+        .hidden { display: none !important; }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Toast Message Box (แทนที่ alert()) */
+        .message-box {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(50px); /* ซ่อนเริ่มต้น */
+            background-color: var(--dark);
+            color: var(--light);
+            padding: 12px 25px;
+            border-radius: 50px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            font-weight: 500;
+        }
+
+        .message-box.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0); /* แสดงขึ้นมา */
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .question {
+                font-size: 1.2rem;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+            
+            input, select {
+                width: 100%;
+                min-width: unset;
+                border-radius: 10px;
+            }
+
+            .stat-item {
+                flex-basis: 45%;
+                margin: 5px;
+            }
+
+            #addBtn {
+                min-width: unset;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>เกม Truth or Dare</h1>
+            <p class="subtitle">จริงหรือกล้า - เล่นสนุกกับเพื่อนๆ</p>
+        </header>
+        
+        <div class="mode-selector">
+            <div class="mode-btn active" id="singleMode">เล่นเดี่ยว</div>
+            <div class="mode-btn" id="multiMode">เล่นกับเพื่อน</div>
+            <div class="mode-btn" id="adultMode">โหมด 18+</div>
+        </div>
+        
+        <!-- คำเตือนโหมด 18+ -->
+        <div class="adult-warning hidden" id="adultWarning">
+            <p>⚠️ คำเตือน: โหมด 18+ มีเนื้อหาที่ไม่เหมาะสมสำหรับผู้เยาว์</p>
+            <button id="confirmAdult">ยืนยันว่าอายุเกิน 18 ปี</button>
+        </div>
+        
+        <!-- ข้อมูลผู้เล่นสำหรับโหมดหลายคน (ถูกซ่อนตามคำขอ) -->
+        <div class="player-info hidden" id="playerInfo">
+            <!-- ผู้เล่นจะถูกแสดงผลทาง JavaScript หากต้องการกลับไปใช้โหมดแสดงรายชื่อผู้เล่น -->
+        </div>
+        
+        <div class="game-area">
+            <!-- การ์ด "จริง" -->
+            <div class="card truth-card fade-in" id="truthCard">
+                <div class="type-badge truth-badge" id="truthBadge">จริง</div>
+                <div class="question" id="truthQuestion">กดปุ่ม "จริง" เพื่อเริ่มเกม!</div>
+            </div>
+            
+            <!-- การ์ด "กล้า" -->
+            <div class="card dare-card hidden" id="dareCard">
+                <div class="type-badge dare-badge" id="dareBadge">กล้า</div>
+                <div class="question" id="dareQuestion">กดปุ่ม "กล้า" เพื่อเริ่มเกม!</div>
+            </div>
+        </div>
+        
+        <div class="buttons">
+            <button class="truth-btn" id="truthBtn">จริง</button>
+            <button class="dare-btn" id="dareBtn">กล้า</button>
+            <button class="random-btn" id="randomBtn">สุ่ม</button>
+        </div>
+        
+        <!-- แถบสถิติการเล่น -->
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="truthCount">0</div>
+                <div>คำถามจริง</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="dareCount">0</div>
+                <div>คำท้า</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="adultCount">0</div>
+                <div>18+ รวม</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="totalCount">0</div>
+                <div>ทั้งหมด</div>
+            </div>
+        </div>
+        
+        <!-- ส่วนสำหรับผู้ใช้เพิ่มคำถาม/คำท้า -->
+        <div class="add-question">
+            <h3>เพิ่มคำถาม/คำท้าของคุณ</h3>
+            <div class="input-group">
+                <input type="text" id="newQuestion" placeholder="พิมพ์คำถามหรือคำท้าของคุณที่นี่">
+                <select id="questionType">
+                    <option value="truth">จริง (ทั่วไป)</option>
+                    <option value="dare">กล้า (ทั่วไป)</option>
+                    <option value="adultTruth">18+ จริง</option>
+                    <option value="adultDare">18+ กล้า</option>
+                </select>
+                <button id="addBtn">เพิ่ม</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Message Box (แทนที่ alert()) -->
+    <div id="messageBox" class="message-box"></div>
+
+    <footer>
+        <p>สร้างด้วย ❤️ สำหรับความบันเทิงกับเพื่อนๆ</p>
+    </footer>
+
+    <script>
+        // ฐานข้อมูลคำถามและคำท้าเริ่มต้น
+        // คำถามจริงทั่วไป
+        const truthQuestions = [
+            "คุณเคยโกหกแฟนเรื่องอะไรบ้าง?", "อะไรคือความลับที่คุณไม่เคยบอกใคร?",
+            "คุณเคยแอบชอบเพื่อนสนิทของคุณไหม?", "อะไรคือสิ่งที่คุณอายที่สุดในชีวิต?",
+            "คุณเคยทำอะไรที่ผิดศีลธรรมบ้าง?", "ถ้าคุณสามารถเปลี่ยนหนึ่งอย่างเกี่ยวกับตัวเองได้ มันจะเป็นอะไร?",
+            "อะไรคือความกลัวที่ใหญ่ที่สุดของคุณ?", "คุณเคยแอบดูโทรศัพท์ของแฟนไหม?",
+            "อะไรคือสิ่งที่คุณเสียดายที่สุดในชีวิต?", "คุณเคยนินทาใครแล้วรู้สึกผิดไหม?",
+            "ถ้าคุณต้องเลือกระหว่างเงินล้านกับความรัก คุณจะเลือกอะไร?", "อะไรคือนิสัยที่แย่ที่สุดของคุณ?",
+            "คุณเคยหลงรักคนที่มีคู่แล้วหรือไม่?", "อะไรคือสิ่งที่คุณโกหกพ่อแม่บ่อยที่สุด?",
+            "คุณเคยแอบขโมยของไหม?", "อะไรคือความฝันที่คุณยังไม่ได้บอกใคร?",
+            "คุณเคยถูกจับได้ขณะทำอะไรที่น่าอายไหม?", "ถ้าคุณเป็นเพศตรงข้ามได้หนึ่งวัน คุณจะทำอะไร?",
+            "คุณเคยเขียนไดอารี่เกี่ยวกับใครบ้าง?", "อะไรคือสิ่งที่คุณอยากทำแต่ยังไม่กล้าทำ?",
+            "คุณเคยแอบชอบครูหรืออาจารย์ไหม?", "ถ้าคุณสามารถลบความทรงจำหนึ่งอย่างได้ จะลบเรื่องอะไร?",
+            "คุณเคยโกหกเพื่อให้ได้งานไหม?", "อะไรคือสิ่งที่คุณซ่อนจากแฟน?",
+            "คุณเคยทำอะไรที่เสี่ยงต่อการเสียชีวิตไหม?", "คุณเคยหลอกใช้ใครให้ทำในสิ่งที่คุณต้องการไหม?",
+            "คุณเคยแอบชอบคนที่เพื่อนของคุณชอบไหม?", "อะไรคือสิ่งที่คุณไม่ชอบในครอบครัวของคุณ?",
+            "คุณเคยถูกไล่ออกจากงานหรือไม่?", "คุณเคยทำให้ใครเสียใจมากๆ ไหม?",
+            "ถ้าคุณมีเงิน 100 ล้านบาท สิ่งแรกที่คุณจะทำคืออะไร?",
+            "นิสัยส่วนตัวอะไรที่คุณพยายามจะเลิกแต่ทำไม่ได้?",
+            "เคยแอบเอาของของเพื่อนไปใช้โดยไม่บอกไหม? (เช่น เสื้อผ้า, เครื่องสำอาง)",
+            "ความทรงจำวัยเด็กที่ชัดเจนและตลกที่สุดคืออะไร?",
+            "คุณเคยส่งข้อความผิดคนและทำให้เกิดเรื่องน่าอายไหม?",
+            "คุณคิดว่าตัวเองเป็นคนเก่งที่สุดในด้านไหน?",
+            "เคยดูหนังเรื่องไหนแล้วร้องไห้หนักที่สุด?",
+            "ถ้าต้องติดอยู่บนเกาะร้างกับคนในวงนี้ คุณจะเลือกใคร?",
+            "คุณเคยคิดแผนที่จะแก้แค้นใครไหม?",
+            "คุณเคยโดนหลอกให้เชื่อเรื่องตลกๆ ที่ไม่จริงไหม?",
+            "ใครคือคนที่คุณเคยพูดจาแย่ๆ ใส่แล้วอยากขอโทษมากที่สุด?",
+            "คุณมีความลับที่ซ่อนอยู่ในห้องหรือกระเป๋าไหม?",
+            "อาหารที่คุณเกลียดที่สุดคืออะไร?",
+            "คุณเคยแต่งเรื่องโกหกเพื่อเลี่ยงการไปงานสังคมไหม?",
+            "สิ่งที่คุณทำได้ดีแต่ไม่มีใครรู้คืออะไร?",
+            "คุณเคยตกหลุมรักตัวละครในเกม/หนัง/ซีรีส์ไหม?",
+            "คุณกลัวอะไรมากที่สุดในความสัมพันธ์?",
+            "คุณเคยแอบเก็บของสะสมแปลกๆ ไว้ไหม?",
+            "สิ่งที่คุณอยากให้เพื่อนๆ รู้สึกดีขึ้นเกี่ยวกับคุณคืออะไร?",
+            "คุณเคยทำลายของมีค่าของคนอื่นโดยไม่ได้ตั้งใจไหม?",
+            "ถ้าได้ย้อนเวลากลับไป คุณจะแก้ไขเรื่องอะไร?",
+            "สัตว์ประหลาดหรือภูตผีที่คุณเชื่อว่ามีจริงคืออะไร?",
+            "คุณเคยแอบฟังการสนทนาของคนอื่นโดยบังเอิญไหม?",
+            "เพลงที่คุณชอบที่สุดแต่รู้สึกอายที่จะเปิดให้คนอื่นฟังคือเพลงอะไร?",
+            "เคยมีใครทำให้คุณรู้สึกประทับใจมากๆ ในทางที่ไม่คาดคิดไหม?",
+            "ถ้าคุณถูกรางวัลใหญ่ จะบอกใครก่อนและจะทำอะไรกับเงินก้อนแรก?",
+            "คุณเคยปลอมเป็นคนอื่นบนอินเทอร์เน็ตเพื่อทำอะไรบางอย่างไหม?",
+            "อะไรคือความประทับใจแรกที่คุณมีต่อผู้เล่นที่อยู่ตรงข้ามคุณจริงๆ?",
+            "ถ้าคุณต้องเลิกกินอาหารอย่างหนึ่งไปตลอดชีวิต คุณจะเลือกเลิกอะไร?",
+            "คุณเคยทำอะไรที่เสี่ยงต่อการโดนจับได้ (เช่น หนีค่าโดยสาร, ทำลายของ) ไหม?",
+            "สิ่งที่คุณคิดว่าคนอื่นส่วนใหญ่เข้าใจผิดเกี่ยวกับคุณคืออะไร?",
+            "คุณเคยโกงข้อสอบหรือการแข่งขันที่สำคัญไหม?",
+            "ถ้าโลกนี้มีเสียงประกอบ (Soundtrack) เพลงธีมชีวิตของคุณคือเพลงอะไร?",
+            "คุณเคยส่งข้อความเสียงแล้วกลับมาฟังซ้ำแล้วรู้สึกอายภายหลังไหม?",
+            "คุณคิดว่าตัวเองจะอายุยืนถึงกี่ปี และทำไมถึงคิดแบบนั้น?"
+        ];
+        
+        // คำท้าทั่วไป
+        const dareTasks = [
+            "โทรหาเพื่อนและร้องเพลงให้เขาฟัง", "โพสต์สถานะแปลกๆ บนโซเชียลมีเดีย",
+            "ทำท่าทางตลกๆ ให้ทุกคนดู", "เลียนแบบสัตว์ชนิดหนึ่งเป็นเวลา 1 นาที",
+            "กินอาหารรสประหลาดโดยไม่แสดงสีหน้า", "เต้นรำแบบไม่มีเพลงประกอบ",
+            "พูดติดอ่างเป็นเวลา 5 นาที", "เล่าเรื่องตลกที่แย่ที่สุดที่คุณรู้",
+            "ทำหน้าตลกๆ ในกล้องเป็นเวลา 30 วินาที", "ร้องเพลงโปรดของคุณด้วยเสียงดัง",
+            "ทำท่าโพสท่าหนังสือการ์ตูนเป็นเวลา 1 นาที", "พูดชมคนข้างๆ อย่างน้อย 3 อย่าง",
+            "ส่งข้อความถึงเพื่อนด้วยคำว่า 'ฉันคิดถึงคุณ'", "เดินเป็นปูเป็นเวลา 1 นาที",
+            "เล่าเรื่องน่าอายที่สุดในชีวิตคุณ", "ร้องเพลงชาติโดยไม่ต้องเปิดเสียง",
+            "ทำเสียงสัตว์จนกว่าจะมีคนทายถูก", "วาดรูปตัวเองโดยไม่มองกระดาษ",
+            "พูดภาษาแปลกๆ ที่คุณสร้างขึ้นเอง", "เต้นท่าเกาหลีแบบแร็ปเปอร์",
+            "ทำท่าเหมือนกำลังตกหลุมรักกับวัตถุใกล้ตัว", "เลียนแบบดาราคนโปรดของคุณ",
+            "พูดคำว่า 'ฉันรักคุณ' กับกระจก", "ทำท่าเหมือนเป็นหุ่นยนต์เป็นเวลา 2 นาที",
+            "ร้องเพลงประกอบท่าทางแบบเด็กเล็ก", "ทำเสียงเอฟเฟกต์ภาพยนตร์ 5 อย่าง",
+            "เล่าเรื่องด้วยสำเนียงต่างจังหวัด", "ทำท่าเหมือนกำลังว่ายน้ำบนบก",
+            "พูดชมตัวเอง 10 อย่างใน 30 วินาที", "เต้นเพลง TikTok ล่าสุดที่คุณรู้",
+            "ใช้เท้าพิมพ์คำว่า 'จริงหรือกล้า' ลงในแชทกลุ่ม",
+            "ทำท่าทางเหมือนกำลังลอยอยู่ในอวกาศเป็นเวลา 1 นาที",
+            "ส่งข้อความเสียงยาว 10 วินาทีถึงคนที่ 3 ในรายชื่อติดต่อของคุณด้วยเสียงแปลกๆ",
+            "ใส่ถุงเท้าไว้ที่มือและทำกิจกรรมต่อไปนี้เป็นเวลา 5 นาที",
+            "ทำท่าเป็นหุ่นยนต์ที่ชาร์จแบตหมด",
+            "พูดคุยกับวัตถุที่อยู่ใกล้ๆ (เช่น โคมไฟ) เหมือนเป็นเพื่อนสนิท",
+            "เลียนแบบการเดินของซูเปอร์โมเดลเป็นเวลา 30 วินาที",
+            "พยายามแตะจมูกด้วยลิ้น (ไม่ว่าจะทำได้หรือไม่ก็ตาม)",
+            "ทำเสียงแมว/สุนัขเมื่อมีคนพูดว่า 'สวัสดี'",
+            "แต่งกลอนสด 4 บรรทัดเกี่ยวกับผู้เล่นที่นั่งอยู่ทางซ้ายของคุณ",
+            "สวมเสื้อผ้ากลับด้านเป็นเวลาที่เหลือของเกม",
+            "ทำท่าทางเหมือนกำลังปวดท้องอย่างรุนแรงเป็นเวลา 10 วินาที",
+            "โพสต์รูปภาพที่ตลกที่สุดของตัวเองลงในสตอรี่โดยไม่ต้องอธิบาย",
+            "ลุกขึ้นยืนและตะโกนว่า 'ฉันคือราชา/ราชินีแห่งเกมนี้!'",
+            "พยายามเลียข้อศอกของคุณ (ไม่ว่าจะทำได้หรือไม่ก็ตาม)",
+            "ให้คนอื่นวาดหนวด/รอยสักบนใบหน้าของคุณด้วยปากกาที่ลบได้",
+            "พูดคำว่า 'กล้วย' ทุกครั้งที่ผู้เล่นคนอื่นพูดว่า 'จริง'",
+            "คลานไปรอบๆ ห้องหนึ่งรอบ",
+            "ดื่มน้ำหนึ่งแก้วโดยใช้เพียงสองนิ้วในการจับแก้ว",
+            "ร้องเพลงแบบโอเปร่าเป็นเวลา 15 วินาที",
+            "โทรหาคนในครอบครัวและพูดว่า 'ผม/หนูทำหุ่นยนต์ตกน้ำ' แล้ววางสายทันที",
+            "เปลี่ยนรูปโปรไฟล์ในโซเชียลมีเดียเป็นรูปภาพที่ไม่เหมาะสม (แต่สุภาพ) เป็นเวลา 15 นาที",
+            "ใช้สำเนียงภาษาอังกฤษแบบบริติชพูด 3 ประโยค",
+            "ทำท่าเหมือนกำลังต่อสู้กับแมลงที่มองไม่เห็น",
+            "เอาหมอนวางบนศีรษะและเดินไปรอบๆ ห้อง 3 ครั้ง",
+            "เปลี่ยนภาษาในโทรศัพท์ของคุณเป็นภาษาอื่น และใช้งานแบบนั้นเป็นเวลา 10 นาที",
+            "ทำท่าทางเหมือนเป็นหุ่นยนต์ที่ชาร์จแบตหมดและต้องคลานไปหาปลั๊ก",
+            "ส่งอีโมจิ 5 ตัวติดกัน โดยไม่มีความหมาย ให้คนแรกในรายชื่อติดต่อของคุณ",
+            "สวมถุงเท้าไว้ที่มือและพยายามแกะห่อขนมด้วยมือเท่านั้น เป็นเวลา 3 นาที",
+            "พูดคุยกับวัตถุที่อยู่ใกล้ๆ (เช่น เก้าอี้) เหมือนเป็นเพื่อนสนิทที่เพิ่งกลับมาจากต่างประเทศ",
+            "เดินถอยหลังไปรอบๆ ห้อง/บริเวณที่เล่นเกมหนึ่งรอบโดยไม่มีใครช่วย",
+            "พยายามแตะจมูกด้วยลิ้นอย่างน้อย 5 ครั้ง (ไม่ว่าจะทำได้หรือไม่ก็ตาม)",
+            "ทำเสียงแมว/สุนัขเมื่อมีคนพูดว่า 'สวัสดี' เป็นเวลา 5 นาที",
+            "พูดชมผู้เล่นที่อยู่ทางขวาของคุณด้วยถ้อยคำที่ตลกและเกินจริงที่สุด 3 ประโยค",
+            "แกล้งร้องไห้แบบดราม่าโอเวอร์สุดๆ เป็นเวลา 20 วินาที"
+        ];
+        
+        // **คำถามจริง 18+**
+        const adultTruths = [
+            "คุณเริ่มช่วยตัวเองตั้งแต่อายุเท่าไหร่?", 
+            "สถานที่แปลกที่สุดที่คุณเคยช่วยตัวเองคือที่ไหน?",
+            "คุณใช้จินตนาการถึงใครเวลาช่วยตัวเอง?", 
+            "คุณเคยถูกจับได้ขณะช่วยตัวเองไหม?",
+            "คุณใช้ของเล่นช่วยตัวเองบ่อยแค่ไหน?", 
+            "อะไรคือฟีทิชทางเพศส่วนตัวของคุณ?",
+            "อะไรคือสิ่งแปลกประหลาดที่สุดที่คุณเคยทำในห้องนอนเพียงลำพัง?",
+            "คุณเคยใช้ของเล่นทางเพศไหม? ถ้าใช้ ชิ้นแรกคืออะไร?",
+            "คุณเคยรู้สึกผิดไหมหลังช่วยตัวเอง?",
+            "คุณเคยลองช่วยตัวเองแบบไม่ใช้มือไหม?",
+            "คุณเคยดูหนังโป๊ประเภทไหนที่คุณไม่ชอบแต่ยังดูอยู่?",
+            "คุณใช้เวลาช่วยตัวเองนานที่สุดเท่าไหร่?",
+            "คุณเคยแอบไปดูใครโป๊ไหม?",
+            "คุณเคยใส่เสื้อผ้าของเพศตรงข้าม/คนรักไหม (เพื่อความสุขส่วนตัว)?",
+            "อะไรคือสิ่งที่ทำให้คุณเร้าอารมณ์ที่สุด?",
+            "คุณเคยโกหกเกี่ยวกับประสบการณ์ทางเพศของคุณไหม?",
+            "คุณคิดว่าอวัยวะส่วนใดของคุณที่เซ็กซี่ที่สุด?",
+            "สิ่งที่ทำให้คุณรู้ว่าคุณเริ่มมีความต้องการทางเพศคืออะไร?", 
+            "คุณเคยใช้เสื้อผ้า/อุปกรณ์ชิ้นไหนช่วยตัวเองแทนของเล่น?",
+            "คุณใช้เวลาอยู่หน้ากระจกเพื่อชมตัวเองในทางเพศนานแค่ไหน?",
+            "คุณมีกิจวัตรการช่วยตัวเองเฉพาะเจาะจงอย่างไร?",
+            "คุณคิดว่าบุคลิกส่วนไหนของคุณที่ดึงดูดใจที่สุดในทางเพศ?",
+            "ความรู้สึกที่แรงที่สุดที่คุณเคยมีจากการช่วยตัวเองคืออะไร?",
+            "คุณเคยมีความคิดแปลกๆ เกี่ยวกับเซ็กส์ที่ทำให้คุณตกใจเองไหม?",
+            "ท่าทางที่คุณทำเมื่อรู้สึกยั่วยวนที่สุดคืออะไร?",
+            "คุณชอบที่จะเป็นฝ่ายถูกมองหรือมองผู้อื่นมากกว่ากัน?",
+            "ถ้าคุณมีพลังวิเศษที่สามารถทำให้อวัยวะส่วนใดส่วนหนึ่งของคุณดึงดูดใจที่สุด คุณจะเลือกส่วนไหน?",
+            "คุณชอบที่จะสำรวจร่างกายของคุณเองส่วนไหนมากที่สุด?",
+            "อะไรคือภาพลักษณ์ทางเพศของตัวเองที่คุณชอบที่สุด?",
+            "คุณเคยแอบถ่ายรูปตัวเองแบบหวือหวาไหม?",
+            "คุณคิดว่าตัวเองเป็นคน 'จัดจ้าน' แค่ไหนในห้องนอน (จาก 1-10)?",
+            "คุณชอบเพศสัมพันธ์แบบรุนแรงหรือแบบอ่อนโยนมากกว่ากัน (ตามจินตนาการ)?",
+            "คุณเคยซื้อหนังสือ/สื่อลามกมาเก็บไว้ส่วนตัวไหม?",
+            "คุณเคยถูกล่อลวงด้วยท่าทางของตัวเองไหม?",
+            "คุณเคยมีจินตนาการทางเพศเกี่ยวกับคนที่คุณเพิ่งเจอไหม?",
+            "คุณเคยมีความปรารถนาที่จะแต่งตัวโป๊ในที่สาธารณะไหม?",
+            "คุณเคยแอบดูหนังโป๊ในสถานที่ที่ไม่ควรไหม?",
+            "คุณเคยคิดว่าตัวเองเป็นนักแสดงหนังโป๊ไหม?",
+            "อะไรคือรสนิยมทางเพศลับๆ ที่คุณซ่อนไว้ไม่ให้ใครรู้?",
+            "คุณรู้สึกยังไงกับการเปลือยกายต่อหน้าตัวเองหรือในที่ส่วนตัว?",
+            "คุณเคยมีจินตนาการทางเพศเกี่ยวกับผู้เล่นในวงนี้ไหม?",
+            "คุณคิดว่าคุณเซ็กซี่ขึ้นมากที่สุดเมื่อทำกิจกรรมอะไร?"
+        ];
+
+        // **คำท้า 18+ (เพิ่มใหม่ 30 ข้อ)**
+        const adultDares = [
+            "จูบส่วนใดส่วนหนึ่งของร่างกายผู้เล่นข้างซ้าย (ไม่ใช่ปาก)", 
+            "ส่งข้อความยั่วยวนถึงแฟนเก่า/แฟนปัจจุบัน โดยไม่ใช้คำหยาบคาย",
+            "เต้นโพลแดนซ์แบบเซ็กซี่ให้ทุกคนดูเป็นเวลา 30 วินาที",
+            "สวมใส่ชุดชั้นในทับเสื้อผ้าที่ใส่อยู่เป็นเวลาที่เหลือของเกม",
+            "ถอดเสื้อผ้าชิ้นหนึ่ง (ที่สามารถถอดได้) และสวมกลับด้วยวิธีที่เซ็กซี่ที่สุด",
+            "ใช้มือข้างเดียวปิดตาตัวเองและพยายามเดาว่าเพื่อนคนไหนกำลังแตะคุณอยู่",
+            "ส่งข้อความสั้นๆ ถึงคนที่คุณอยากมีอะไรด้วยที่สุดในตอนนี้",
+            "เล่าฉากเซ็กส์ที่คุณเคยฝันถึง",
+            "สาธิตท่าทางการหายใจและเสียงที่คุณทำขณะถึงจุดสุดยอด",
+            "จิบน้ำจากแก้วด้วยท่าทางที่ยั่วยวนที่สุด",
+            "อนุญาตให้เพื่อนคนข้างซ้ายเลือกเสื้อผ้าหนึ่งชิ้นที่คุณจะต้องถอดออกจนกว่าจะจบรอบนี้ (ถ้าไม่อยากทำ ต้องดื่มน้ำเปล่า 1 แก้วเต็มๆ)",
+            "เล่าเรื่องราว 'ครั้งแรก' ของคุณอย่างละเอียด",
+            "ทำท่าเหมือนกำลังอาบน้ำด้วยการลูบไล้ตัวเองอย่างเซ็กซี่",
+            "พิมพ์ชื่อหนังโป๊ที่คุณชอบที่สุดลงในโทรศัพท์แล้วให้เพื่อนดู",
+            "บอกวิธีที่คุณจะ 'เริ่ม' จีบคนที่คุณสนใจ",
+            "ถอดถุงเท้าด้วยปากของคุณ",
+            "หายใจรดหูเพื่อนคนข้างขวาเป็นเวลา 15 วินาที",
+            "ใช้ลิ้นลากไปตามส่วนใดส่วนหนึ่งบนร่างกายของคุณที่เพื่อนคนข้างหน้าเลือก",
+            "ให้เพื่อนคนใดคนหนึ่งใช้มือลูบไล้คุณที่แขนเป็นเวลา 10 วินาที",
+            "จูบพื้น/กำแพง/วัตถุใกล้ตัวด้วยท่าทางโรแมนติกที่สุด",
+            "เปิดแอปพลิเคชันหาคู่ (ถ้ามี) แล้วกดถูกใจคนที่คุณคิดว่า 'ฮอต' ที่สุด 3 คน",
+            "ส่งข้อความเสียงที่มีแต่เสียงครางแบบตลกๆ ให้เพื่อนที่ไม่เล่นเกมนี้",
+            "พูดคำชมที่ยั่วยวนที่สุดที่คุณคิดได้กับตัวเองในกระจก",
+            "ให้เพื่อนคนหนึ่งเขียนคำว่า 'เซ็กซี่' บนหน้าผากของคุณโดยที่คุณไม่รู้ตัว",
+            "ใช้ซอสมะเขือเทศ (ถ้ามี) หรืออะไรที่คล้ายกันวาดรูปอวัยวะเพศบนจาน",
+            "ใช้ร่างกายของคุณสะกดคำว่า S.E.X. (โดยไม่ใช้มือ)",
+            "สวมเสื้อผ้าของเพื่อนคนใดคนหนึ่งให้เร็วที่สุด",
+            "ทำท่าทางและเสียงเหมือนกำลังถึงจุดสุดยอดจากการกินอาหาร/เครื่องดื่มที่คุณเพิ่งกิน",
+            "บอกความปรารถนาลับที่คุณไม่เคยบอกใคร (เช่น อยากมีเซ็กส์แบบ BDSM)",
+            "ลองจูบอากาศในทิศทางต่างๆ 5 ครั้ง",
+            "ถ่ายภาพเซลฟี่ที่เซ็กซี่ที่สุดที่คุณเคยถ่ายมา (ไม่จำเป็นต้องเปิดเผย) และส่งให้เพื่อนคนในวงดู",
+            "ใช้ปากของคุณหยิบสิ่งของชิ้นเล็กๆ จากพื้น",
+            "เดินแบบแมวอย่างช้าๆ ในสายตาของทุกคน",
+            "เล่าว่าคุณใช้เวลาเตรียมตัวนานแค่ไหนก่อนจะมีเซ็กส์กับคนรัก",
+            "ให้เพื่อนคนข้างขวาจับก้นของคุณเบาๆ เป็นเวลา 5 วินาที",
+            "ทำท่าทางเหมือนคุณกำลังติดอยู่กับคนที่คุณมีเซ็กส์ล่าสุด",
+            "ใช้มือของคุณทำท่าเป็นรูปหัวใจแล้ววางทับหน้าอก/เป้าของคุณ",
+            "พูดคำว่า 'โอ๊ย' ด้วยเสียงดังและเร้าอารมณ์ 3 ครั้ง",
+            "ลองแต่งหน้า/ทำผมแบบยั่วยวนภายใน 1 นาที",
+            "พยายามถอดกางเกงโดยใช้มือเดียว",
+            // ******************* เพิ่มคำท้า 18+ ใหม่ 30 ข้อ *******************
+            "ส่งข้อความถึงเพื่อนคนหนึ่ง บอกว่าคุณได้ทำอะไรที่ 'เร่าร้อน' เมื่อคืนนี้",
+            "เลียริมฝีปากตัวเองแบบช้าๆ และเซ็กซี่ให้ทุกคนดู",
+            "ใช้เสื้อผ้าของคุณปิดตาแล้วให้เพื่อนคนข้างขวาป้อนอาหารให้คุณ",
+            "สวมกางเกงในทับกางเกง/กระโปรงที่คุณใส่อยู่เป็นเวลา 3 รอบ",
+            "ถอดถุงเท้าด้วยปากของคุณ",
+            "กระซิบคำพูดที่ยั่วยวนที่สุดที่คุณคิดได้ใส่หูเพื่อนคนข้างซ้าย",
+            "ทำท่าทางเหมือนคุณกำลังถอดเสื้อผ้าช้าๆ (แต่ไม่ต้องถอดจริง)",
+            "พยายามแตะปลายเท้าของคุณโดยใช้หน้าอกของคุณเท่านั้น",
+            "พูดถึงจุดที่ 'กระตุ้น' ที่สุดในร่างกายของคุณและเหตุผล",
+            "สวมรองเท้าส้นสูง (ถ้ามี) แล้วเดินยั่วยวน 1 รอบห้อง",
+            "ถ่ายรูปส่วนที่เซ็กซี่ที่สุดของร่างกาย (ที่ไม่โป๊) แล้วให้เพื่อนดู",
+            "ทำท่าทางและเสียงเหมือนกำลังถึงจุดสุดยอดจากการกินช็อกโกแลต",
+            "บอกว่าคุณชอบให้ใคร 'นำ' หรือ 'ตาม' ในเรื่องบนเตียงมากกว่ากัน",
+            "ให้เพื่อนคนใดคนหนึ่งใช้นิ้วลากไปตามแนวกระดูกสันหลังของคุณ",
+            "สาธิตท่า 'Dirty Dancing' ที่คุณทำได้ดีที่สุด",
+            "เล่าประสบการณ์เซ็กส์ที่ตลกที่สุดที่คุณเคยมี",
+            "แกล้งเป็นคนแปลกหน้าที่คุณคิดว่า 'ฮอต' แล้วจีบเพื่อนคนหนึ่ง",
+            "ใช้ลิ้นเขียนชื่อเพื่อนคนข้างซ้ายบนผิวหนังของคุณ (เช่น แขน)",
+            "พูดชมเชยตัวเอง 5 อย่างเกี่ยวกับรูปร่างหน้าตาของคุณ",
+            "ให้เพื่อนคนหนึ่งจัดท่า 'ยั่วยวน' ให้คุณถ่ายรูป (ไม่ต้องถ่ายจริง)",
+            "เต้นรำช้าๆ แบบยั่วยวนกับวัตถุที่อยู่ใกล้คุณ (เช่น เก้าอี้)",
+            "เล่าเรื่อง 'ของเล่น' ที่คุณเคยแอบซ่อนไว้",
+            "พยายามดึงเสื้อผ้า (ที่ไม่ใช่ชั้นใน) ของเพื่อนคนข้างซ้ายออกด้วยปากของคุณ",
+            "ทำเสียงครางแบบ 'ยั่วๆ' 5 แบบติดต่อกัน",
+            "บอกตำแหน่งที่คุณชอบให้ถูกสัมผัสมากที่สุดในร่างกาย",
+            "ถ่ายรูปเซลฟี่ที่เซ็กซี่ที่สุดของคุณตอนนี้ และให้เพื่อนคนข้างขวาดู",
+            "สวมเสื้อผ้าที่ยืดหยุ่นได้แล้วลองทำท่าโยคะที่เซ็กซี่ที่สุด",
+            "ทำท่าทางเหมือนคุณกำลังติดอยู่ในเสื้อผ้าที่คับแน่นมาก",
+            "ลองทำท่าทางที่คนมองแล้วรู้สึกว่าคุณกำลัง 'ต้องการ' อะไรบางอย่าง",
+            "เล่าจินตนาการทางเพศที่ 'หยาบคาย' ที่สุดที่คุณเคยคิด"
+            // *******************************************************************
+        ];
+        
+        // ตัวแปรสำหรับเก็บคำถามและคำท้าที่ผู้ใช้เพิ่ม
+        let customTruths = [];
+        let customDares = [];
+        let customAdultTruths = [];
+        let customAdultDares = [];
+        
+        // อ้างอิง DOM elements
+        const truthCard = document.getElementById('truthCard');
+        const dareCard = document.getElementById('dareCard');
+        const truthQuestion = document.getElementById('truthQuestion');
+        const dareQuestion = document.getElementById('dareQuestion');
+        const truthBadge = document.getElementById('truthBadge');
+        const dareBadge = document.getElementById('dareBadge');
+        const truthBtn = document.getElementById('truthBtn');
+        const dareBtn = document.getElementById('dareBtn');
+        const randomBtn = document.getElementById('randomBtn');
+        const playerInfo = document.getElementById('playerInfo');
+        const singleModeBtn = document.getElementById('singleMode');
+        const multiModeBtn = document.getElementById('multiMode');
+        const adultModeBtn = document.getElementById('adultMode');
+        const adultWarning = document.getElementById('adultWarning');
+        const confirmAdultBtn = document.getElementById('confirmAdult');
+        const newQuestionInput = document.getElementById('newQuestion');
+        const questionTypeSelect = document.getElementById('questionType');
+        const addBtn = document.getElementById('addBtn');
+        const truthCount = document.getElementById('truthCount');
+        const dareCount = document.getElementById('dareCount');
+        const adultCount = document.getElementById('adultCount');
+        const totalCount = document.getElementById('totalCount');
+        const messageBox = document.getElementById('messageBox'); // อ้างอิง Message Box ใหม่
+        
+        // ตัวแปรสำหรับติดตามสถานะเกม
+        // ลบ currentPlayerIndex และ player array เนื่องจากลบการแสดงผลผู้เล่นแล้ว
+        let isMultiplayer = false;
+        let isAdultMode = false;
+        
+        // ฟังก์ชันแสดงข้อความแจ้งเตือน (Toast Message) แทน alert()
+        function showMessage(message, duration = 3000) {
+            messageBox.textContent = message;
+            messageBox.classList.add('show');
+            
+            setTimeout(() => {
+                messageBox.classList.remove('show');
+            }, duration);
+        }
+
+        // อัพเดทสถิติ
+        function updateStats() {
+            const totalTruth = truthQuestions.length + customTruths.length;
+            const totalDare = dareTasks.length + customDares.length;
+            const totalAdult = adultTruths.length + customAdultTruths.length + adultDares.length + customAdultDares.length;
+
+            truthCount.textContent = totalTruth;
+            dareCount.textContent = totalDare;
+            adultCount.textContent = totalAdult;
+            totalCount.textContent = totalTruth + totalDare + totalAdult;
+        }
+        
+        // ฟังก์ชันสุ่มคำถามหรือคำท้า
+        function getRandomItem(list, type) {
+            if (list.length === 0) return `ไม่มีคำถาม '${type}' ให้เล่นแล้ว! ลองเพิ่มคำถามใหม่`;
+            return list[Math.floor(Math.random() * list.length)];
+        }
+
+        function getRandomTruth() {
+            if (isAdultMode) {
+                const allAdultTruths = [...adultTruths, ...customAdultTruths];
+                return getRandomItem(allAdultTruths, '18+ จริง');
+            }
+            const allTruths = [...truthQuestions, ...customTruths];
+            return getRandomItem(allTruths, 'จริง');
+        }
+        
+        function getRandomDare() {
+            if (isAdultMode) {
+                const allAdultDares = [...adultDares, ...customAdultDares];
+                return getRandomItem(allAdultDares, '18+ กล้า');
+            }
+            const allDares = [...dareTasks, ...customDares];
+            return getRandomItem(allDares, 'กล้า');
+        }
+        
+        // ฟังก์ชันเปลี่ยนผู้เล่น (ถูกลบออก/ลดความซับซ้อนตามคำขอ)
+        // เนื่องจากไม่มีการแสดงผลผู้เล่นแล้ว จึงไม่ต้องมีการสลับตาแบบมองเห็น
+        function nextPlayer() {
+            // ฟังก์ชันนี้ถูกทิ้งไว้เพื่อรองรับโครงสร้างเดิม แต่ไม่ได้ใช้งานการสลับผู้เล่นบน UI แล้ว
+        }
+        
+        // ฟังก์ชันอัพเดทการ์ดและสไตล์ตามโหมด
+        function updateCardStyle(card, badge, isTruth, isAdult) {
+            // ล้างคลาสสไตล์ทั้งหมดที่เกี่ยวข้องกับโหมด
+            card.classList.remove('truth-card', 'dare-card', 'adult-truth-card', 'adult-dare-card');
+            badge.classList.remove('truth-badge', 'dare-badge', 'adult-badge');
+
+            if (isAdult) {
+                card.classList.add(isTruth ? 'adult-truth-card' : 'adult-dare-card');
+                badge.classList.add('adult-badge');
+                badge.textContent = isTruth ? '18+ จริง' : '18+ กล้า';
+            } else {
+                card.classList.add(isTruth ? 'truth-card' : 'dare-card');
+                badge.classList.add(isTruth ? 'truth-badge' : 'dare-badge');
+                badge.textContent = isTruth ? 'จริง' : 'กล้า';
+            }
+        }
+        
+        // ฟังก์ชันแสดงการ์ดด้วยเอฟเฟกต์
+        function showCard(cardToShow, cardToHide) {
+            // ซ่อนการ์ดเก่า
+            cardToHide.classList.add('hidden');
+            cardToHide.classList.remove('fade-in');
+            
+            // แสดงการ์ดใหม่พร้อมเอฟเฟกต์
+            setTimeout(() => {
+                cardToShow.classList.remove('hidden');
+                setTimeout(() => {
+                    cardToShow.classList.add('fade-in');
+                }, 10);
+            }, 100); // ดีเลย์สั้นๆ เพื่อให้การซ่อนสมบูรณ์
+        }
+        
+        // Event Listeners
+        truthBtn.addEventListener('click', function() {
+            truthQuestion.textContent = getRandomTruth();
+            updateCardStyle(truthCard, truthBadge, true, isAdultMode);
+            showCard(truthCard, dareCard);
+            nextPlayer();
+        });
+        
+        dareBtn.addEventListener('click', function() {
+            dareQuestion.textContent = getRandomDare();
+            updateCardStyle(dareCard, dareBadge, false, isAdultMode);
+            showCard(dareCard, truthCard);
+            nextPlayer();
+        });
+        
+        randomBtn.addEventListener('click', function() {
+            const mode = Math.random() < 0.5 ? 'truth' : 'dare';
+
+            if (mode === 'truth') {
+                truthBtn.click();
+            } else {
+                dareBtn.click();
+            }
+        });
+        
+        singleModeBtn.addEventListener('click', function() {
+            isMultiplayer = false;
+            isAdultMode = false;
+            // ซ่อน/แสดงองค์ประกอบตามโหมด
+            singleModeBtn.classList.add('active');
+            multiModeBtn.classList.remove('active');
+            adultModeBtn.classList.remove('active');
+            playerInfo.classList.add('hidden'); // ซ่อน player info
+            adultWarning.classList.add('hidden'); // ซ่อนคำเตือน
+        });
+        
+        multiModeBtn.addEventListener('click', function() {
+            isMultiplayer = true;
+            isAdultMode = false;
+            // ซ่อน/แสดงองค์ประกอบตามโหมด
+            multiModeBtn.classList.add('active');
+            singleModeBtn.classList.remove('active');
+            adultModeBtn.classList.remove('active');
+            playerInfo.classList.add('hidden'); // ซ่อน player info
+            adultWarning.classList.add('hidden'); // ซ่อนคำเตือน
+            showMessage('เปิดโหมด "เล่นกับเพื่อน" แล้ว ให้สลับกันเล่นตามลำดับครับ!', 4000);
+        });
+        
+        adultModeBtn.addEventListener('click', function() {
+            // โหมดผู้ใหญ่ต้องยืนยันก่อน
+            if (!isAdultMode) {
+                adultWarning.classList.remove('hidden');
+                // ล้างโหมดอื่นที่ถูกกดไว้ก่อนหน้า
+                singleModeBtn.classList.remove('active');
+                multiModeBtn.classList.remove('active');
+            } else {
+                // หากเปิดอยู่แล้ว ให้ปิด
+                isAdultMode = false;
+                adultModeBtn.classList.remove('active');
+                // กลับไปโหมด Multi-player เป็นค่าเริ่มต้น
+                multiModeBtn.click();
+            }
+        });
+        
+        confirmAdultBtn.addEventListener('click', function() {
+            adultWarning.classList.add('hidden');
+            activateAdultMode();
+        });
+        
+        function activateAdultMode() {
+            isAdultMode = true;
+            isMultiplayer = true; // โหมด 18+ ควรเล่นกับเพื่อน
+            
+            adultModeBtn.classList.add('active');
+            singleModeBtn.classList.remove('active');
+            multiModeBtn.classList.remove('active'); 
+            
+            playerInfo.classList.add('hidden'); // ซ่อน player info
+            showMessage('🔞 เปิดใช้งานโหมด 18+ แล้ว ปุ่ม "จริง" และ "กล้า" จะสุ่มคำถาม/คำท้าสำหรับผู้ใหญ่!', 6000);
+        }
+        
+        addBtn.addEventListener('click', function() {
+            const newQuestion = newQuestionInput.value.trim();
+            const type = questionTypeSelect.value;
+            
+            if (newQuestion) {
+                if (type === 'truth') {
+                    customTruths.push(newQuestion);
+                    showMessage('✅ เพิ่มคำถาม "จริง (ทั่วไป)" สำเร็จ!', 3000);
+                } else if (type === 'dare') {
+                    customDares.push(newQuestion);
+                    showMessage('✅ เพิ่มคำท้า "กล้า (ทั่วไป)" สำเร็จ!', 3000);
+                } else if (type === 'adultTruth') {
+                    customAdultTruths.push(newQuestion);
+                    showMessage('✅ เพิ่มคำถาม "18+ จริง" สำเร็จ!', 3000);
+                } else if (type === 'adultDare') {
+                    customAdultDares.push(newQuestion);
+                    showMessage('✅ เพิ่มคำท้า "18+ กล้า" สำเร็จ!', 3000);
+                }
+                
+                newQuestionInput.value = '';
+                updateStats(); // อัพเดทจำนวนคำถามที่เพิ่ม
+            } else {
+                showMessage('❌ กรุณากรอกคำถามหรือคำท้า', 4000);
+            }
+        });
+        
+        // เริ่มต้นเกมเมื่อโหลด
+        window.onload = function() {
+            singleModeBtn.click(); // เริ่มต้นด้วยโหมดเล่นเดี่ยว
+            updateStats();
+        }
+    </script>
+</body>
+</html>
